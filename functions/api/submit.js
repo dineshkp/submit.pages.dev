@@ -18,6 +18,14 @@ export async function onRequestPost({ request }) {
 		}
 
 		let pretty = JSON.stringify(output, null, 2);
+
+		emailjs.send("service_aao9xuo","template_p8tgx3e",{
+			from_name: "DineshKP",
+			name: pretty.name,
+			message: pretty.message,
+			reply_to: "hello@dineshkp.com",
+			});
+
 		return new Response(pretty, {
 			headers: {
 				'Content-Type': 'application/json;charset=utf-8'

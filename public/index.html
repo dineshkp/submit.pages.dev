@@ -9,6 +9,17 @@
 		<meta name="viewport" content="width=device-width,initial-scale=1">
 		<link rel="icon" type="image/png" href="https://www.cloudflare.com/favicon-128.png">
 		<link rel="stylesheet" href="/index.css">
+
+		<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+		<script
+			type="text/javascript"
+			src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js">
+		</script>
+		<script type="text/javascript">
+			(function () {
+				emailjs.init('Yx1vtF_UyXFFLLL9U');
+			})();
+		</script>
 	</head>
 	<body>
 
@@ -21,7 +32,7 @@
 				<p><b>NOTE:</b> On form submission, the API endpoint responds with a JSON representation of the data. There is no JavaScript running in this example.</p>
 			</blockquote>
 
-			<form method="POST" action="/api/submit">
+			<form id="demo-form">
 				<div class="input">
 					<label for="name">Full Name</label>
 					<input id="name" name="name" type="text" />
@@ -33,6 +44,11 @@
 				</div>
 
 				<div class="input">
+					<label for="message">Message</label>
+					<textarea name="message" id="message" cols="30" rows="10"></textarea>
+				</div>
+
+				<!-- <div class="input">
 					<label for="referers">How did you hear about us?</label>
 					<select id="referers" name="referers">
 						<option hidden disabled selected value></option>
@@ -64,11 +80,55 @@
 							<label for="m4">Home Alone</label>
 						</li>
 					</ul>
-				</div>
+				</div> -->
 
-				<button type="submit">Submit</button>
+				<div id="recaptcha" class="g-recaptcha"
+					data-sitekey="6LeQ8hgpAAAAAGANcKG2LZ9LD1M0V-qWjkkQ2OWV"
+					data-callback="onSubmit"
+					data-size="invisible"></div>
+
+				<button id="submit">Submit</button>
 			</form>
 		</main>
+
+		<script>
+			const form = document.getElementById('demo-form');
+			function onSubmit(token) {
+
+				console.log(`g-recaptcha-response: ${token}`);
+
+				const name = form.elements['name'].value;
+				const email = form.elements['email'].value;
+				const message = form.elements['message'].value;
+
+				var templateParams = {
+					name: name,
+					email: email,
+					message: message,
+					'g-recaptcha-response': token
+				};
+				emailjs.send("service_aao9xuo","template_p8tgx3e", templateParams, 'Yx1vtF_UyXFFLLL9U', 'g-recaptcha-response')
+					.then(function(response) {
+						alert('Mail sent!');
+					console.log('SUCCESS!', response.status, response.text);
+					}, function(error) {
+						alert('Something went wrong, we could not send the email!');
+					console.log('FAILED...', error);
+					});
+			}
+
+			function validate(event) {
+				event.preventDefault();
+				// The form validation goes here
+				// We do not have any validations for the current form
+				grecaptcha.execute();
+			}
+
+			(() => {
+				var element = document.getElementById('submit');
+      			element.onclick = validate;
+			})();
+		  </script>
 
 	</body>
 </html>
